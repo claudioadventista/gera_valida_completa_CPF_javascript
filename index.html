@@ -1,3 +1,4 @@
+
 <style>
     .container{
         border:solid 1px #ccc;
@@ -24,8 +25,12 @@
         background:#ffa;
         padding:10px;
     }
-    #cpf, #cpf2, #cpf3{
+    #cpf, #cpf2{
         width:170px;
+        font-size:1.5em;
+    }
+    #cpf3{
+         width:50px;
         font-size:1.5em;
     }
 </style>
@@ -43,8 +48,9 @@
     <center><span id="estado">.</span></center>
     <h4><center>Completa o CPF</center></h4>
     <form class="form" method="post" action="#">
-        <div>C P F completo</div>
+        <div>C P F completo &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp D.V.</div>
         <input id="cpf2" type="text" readonly >
+        <input id="cpf3" type="text" readonly >
         <input type="submit" class="gerar" value="L I M P A R"  onclick="return limpar()" >
         </form>    
        
@@ -96,6 +102,7 @@
     function mostraCPF(){
         cpf.value = geraCPF();
         cpf2.value ="";
+        cpf3.value ="";
         validar();
         estadoPeloCpf();
         return false;
@@ -146,8 +153,10 @@
             retorno = '';
                 cpf1 = '' + n1 + n2 + n3 + n4 + n5 + n6 + n7 + n8 + n9 + d1 + d2;
             cpf2.value = cpf1;
+            cpf3.value = cpf1.substring(9, 11);
         }else{
             cpf2.value ="";
+            cpf3.value ="";
         }
     }
 
@@ -187,6 +196,7 @@
     function limpar(){
         cpf.value=''; 
         cpf2.value=''; 
+        cpf3.value='';
         cpf.focus();
         messages.style.color= "#f3f781";
         estado.style.color= "#f3f781";
