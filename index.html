@@ -3,7 +3,7 @@
         border:solid 1px #ccc;
         border-radius:5px;
         margin:1% auto;
-        width:280px;
+        width:380px;
         padding:0 30px 30px 30px;
         font-family: arial;
         background:#f3f781;
@@ -13,6 +13,7 @@
         padding:7px;
         cursor:pointer;
         float:right;
+        margin-left:10px;
 
     }
     #messages{
@@ -36,6 +37,7 @@
         <input id="cpf" type="text" maxlength="11" onkeyup="validar(); completaCPF()"  
         onkeypress="return event.charCode >= 48 && event.charCode <= 57" autofocus autocomplete="off" >
         <input type="submit" class="gerar" value="G E R A R"  onclick="return mostraCPF()" >
+        <input type="submit" class="gerar" value="C O P I A R"  onclick="return copiar()" >
     </form>
     <center><span id="messages">.</span></center>
     <center><span id="estado">.</span></center>
@@ -188,6 +190,15 @@
         cpf.focus();
         messages.style.color= "#f3f781";
         estado.style.color= "#f3f781";
+        return false;
+    }
+
+    // copia o cpf se for válido e se estiver mostrando verde
+    function copiar(){
+        if(messages.innerHTML =="CPF válido" && messages.style.color =="green" ){
+            cpf.select();
+            document.execCommand('copy');
+        }
         return false;
     }
 </script>
