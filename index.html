@@ -4,7 +4,7 @@
         border:solid 1px #ccc;
         border-radius:5px;
         margin:1% auto;
-        width:380px;
+        width:690px;
         padding:0 30px 30px 30px;
         font-family: arial;
         background:#f3f781;
@@ -25,35 +25,48 @@
         background:#ffa;
         padding:10px;
     }
-    #cpf, #cpf2{
+    #cpf{
         width:170px;
         font-size:1.5em;
     }
-    #cpf3{
-         width:50px;
-        font-size:1.5em;
+    #escolhaEstado{
+        float:right;
     }
+    .nomeEstado{
+        margin-left:140px;
+    }
+    
 </style>
 
 <div class="container">
-    <h4><center>Gera e valida CPF em javascript</center></h4>
+    <h4><center>Gera, valida e cria CPFs válidos em javascript</center></h4>
     <form class="form" method="post" action="#">
-        <div>C P F</div>
-        <input id="cpf" type="text" maxlength="11" onkeyup="validar(); completaCPF()"  
+        <div>C P F <span class="nomeEstado">Gera CPF por estado </span></div>
+        <input id="cpf" type="text" maxlength="11" title="Digite o CPF para validar"  onkeyup="validar(); completaCPF()"  
         onkeypress="return event.charCode >= 48 && event.charCode <= 57" autofocus autocomplete="off" >
-        <input type="submit" class="gerar" value="G E R A R"  onclick="return mostraCPF()" >
-        <input type="submit" class="gerar" value="C O P I A R"  onclick="return copiar()" >
-    </form>
-    <center><span id="messages">.</span></center>
-    <center><span id="estado">.</span></center>
-    <h4><center>Completa o CPF</center></h4>
-    <form class="form" method="post" action="#">
-        <div>C P F completo &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp D.V.</div>
-        <input id="cpf2" type="text" readonly >
-        <input id="cpf3" type="text" readonly >
-        <input type="submit" class="gerar" value="L I M P A R"  onclick="return limpar()" >
-        </form>    
+        <input type="submit" class="gerar" title="Gera CPF válido" value="G E R A R"  onclick="return mostraCPF()" >
+        <input type="submit" class="gerar" title="Copia CPF válido" value="C O P I A R"  onclick="return copiar()" >
+        <input type="submit" class="gerar" title="Limpa o campo CPF" value="L I M P A R"  onclick="return limpar()" >
        
+            <select class="gerar" name="escolhaEstado" id="escolhaEstado">
+                <option value="T">Todos os estados              </option>
+                <option value="0"> 0 - RS                       </option>
+                <option value="1"> 1 - DF, GO, MS e TO          </option>
+                <option value="2"> 2 - PA, AM, AC, AP, RO e RR  </option>
+                <option value="3"> 3 - CE, MA e PI              </option>
+                <option value="4"> 4 - PE, RN, PB e AL          </option>
+                <option value="5"> 5 - BA e SE                  </option>
+                <option value="6"> 6 - MG                       </option>
+                <option value="7"> 7 - RJ e ES                  </option>
+                <option value="8"> 8 - SP                       </option>
+                <option value="9"> 9 - PR e SC                  </option>
+            </select>
+    </form>
+   
+    
+    <center><span id="messages"></span></center>
+    <div id="estado"></div><br>
+   
 </div>
        
 <script>
@@ -64,8 +77,14 @@
 
     // função que valida o cpf digitado 
     function validaCPF(cpf) {
+        /*
+        let noRepeat = /([0-9]{2,3})\1/g;
+        if(noRepeat.test(cpf)){
+            return false;
+        */
         if (typeof cpf !== 'string' || cpf == 12345678909) return false
         if (typeof cpf !== 'string' || cpf == 98765432100) return false
+
         cpf = cpf.replace(/[^\d]+/g, '')
         if (cpf.length !== 11 || !!cpf.match(/(\d)\1{10}/)) return false
         cpf = cpf.split('')
@@ -82,10 +101,15 @@
 
     // função que gera o cpf
     function geraCPF() {
+
         let total_array = 9;
         let n = 9;
         let [n1, n2, n3, n4, n5, n6, n7, n8, n9] = create_array(total_array, n);
-
+        
+        if(escolhaEstado.value !== 'T'){
+            n9 = escolhaEstado.value;
+        };
+        
         let d1 = n9 * 2 + n8 * 3 + n7 * 4 + n6 * 5 + n5 * 6 + n4 * 7 + n3 * 8 + n2 * 9 + n1 * 10;
         d1 = 11 - (mod(d1, 11));
         if (d1 >= 10) d1 = 0;
@@ -100,37 +124,53 @@
 
     // mostrar o cpf gerado e valida
     function mostraCPF(){
+        // gera um cpf válido e mostra no campo cpf
         cpf.value = geraCPF();
-        cpf2.value ="";
-        cpf3.value ="";
+        // chama a função para validar o cpf mostrado
         validar();
+        // chama a função para escolher o estado do cpf mostrado
         estadoPeloCpf();
+        // retorna falso o clique do botão G E R A R, para não atualizar a página
         return false;
+
     };
 
     // chama a função para validar o cpf digitado
     function validar(){
-        if(cpf.value.length == 11){
+       
+        if(cpf.value.length >= 10){
+            // limpa tudo se tentar usar o backspace quando ja foi validado
+            let key = event.keyCode || event.charCode;
+            if(key == 8 || key == 46){
+                limpar();
+            }
             if(validaCPF(cpf.value)){
+                // se o cpf digitado for válido mostra aqui
                 messages.style.color ="green";
                 messages.innerHTML="CPF válido";
-                estado.style.color= "#000";
                 estadoPeloCpf();
                 
             }else{
-                messages.style.color ="red";
-                messages.innerHTML="CPF inválido";
+                if(cpf.value.length >0){
+                    // se o cpf for inválido mostra aqui, a lógica do código 
+                    // não permite gerar ou digitar um cpf inválido, a não ser que  
+                    // repita o mesmo número nove vezes, ou que esteja na lista de CPFs inválidos 
+                    messages.style.color ="red";
+                    messages.innerHTML="CPF inválidos";
+                };
             };   
         }else{
-            messages.style.color= "#f3f781";
-            estado.style.color= "#f3f781";
-            
+            // enquanto o cpf não for completado, mostra nenhuma informação
+            estado.innerHTML="";
+            messages.innerHTML="";
         };
+
     };  
 
     // completa o cpf digitado ao digitar o nono
     function completaCPF(field) {
-        if (cpf.value.length > 8) {
+
+        if (cpf.value.length == 9) {
             var n = 9;
             var n1 = cpf.value.substring(0, 1);
             var n2 = cpf.value.substring(1, 2);
@@ -152,63 +192,67 @@
                 d2 = 0;
             retorno = '';
                 cpf1 = '' + n1 + n2 + n3 + n4 + n5 + n6 + n7 + n8 + n9 + d1 + d2;
-            cpf2.value = cpf1;
-            cpf3.value = cpf1.substring(9, 11);
-        }else{
-            cpf2.value ="";
-            cpf3.value ="";
-        }
-    }
+            
+                cpf.value = cpf.value + cpf1.substring(9, 11);
+                cpf.readonly = "true";
+                validar();
+                estadoPeloCpf();  
+        };
+
+    };
 
     // mostra o estado do cpf válido
     function estadoPeloCpf(){
-        if (cpf.value.length > 8) {
+
+        if(messages.innerHTML =="CPF válido" && messages.style.color =="green" ){
             let n9 = cpf.value.substring(8,9);
             if (n9 == 0) {
-                estado.innerHTML = "RS";   
+                estado.innerHTML = "Dig. 0 Estado(s) - RS";   
             } else if (n9 == 1) {
-            estado.innerHTML = "DF, GO, MS e TO";
+            estado.innerHTML = "Dig. 1 Estado(s) - DF, GO, MS e TO";
             } else if (n9 == 2) {
-            estado.innerHTML = "PA, AM, AC, AP, RO e RR";
+            estado.innerHTML = "Dig. 2 Estado(s) - PA, AM, AC, AP, RO e RR";
             } else if (n9 == 3) {
-                estado.innerHTML = "CE, MA e PI";
+                estado.innerHTML = "Dig. 3 Estado(s) - CE, MA e PI";
             } else if (n9 == 4) {
-                estado.innerHTML = "PE, Rio GN, PB e AL";
+                estado.innerHTML = "Dig. 4 Estado(s) - PE, RN, PB e AL";
             } else if (n9 == 5) {
-                estado.innerHTML = "BA e SE";
+                estado.innerHTML = "Dig. 5 Estado(s) - BA e SE";
             } else if (n9 == 6) {
-                estado.innerHTML = "MG";
+                estado.innerHTML = "Dig. 6 Estado(s) - MG";
             } else if (n9 == 7) {
-                estado.innerHTML = "RJ e ES";
+                estado.innerHTML = "Dig. 7 Estado(s) - RJ e ES";
             } else if (n9 == 8) {
-                estado.innerHTML = "SP";
+                estado.innerHTML = "Dig. 8 Estado(s) - SP";
             } else if (n9 == 9) {
-                estado.innerHTML = "PR e SC";
+                estado.innerHTML = "Dig. 9 Estado(s) - PR e SC";
             }else{
                 estado.innerHTML="";
             };
-        }else{
-        estado.innerHTML ="";
-        };         
-    }
+        };
+
+    };
 
     // limpa todos os campos e seta o foco no campo cpf
     function limpar(){
+
         cpf.value=''; 
-        cpf2.value=''; 
-        cpf3.value='';
         cpf.focus();
-        messages.style.color= "#f3f781";
-        estado.style.color= "#f3f781";
+        estado.innerHTML="";
+        messages.innerHTML="";
         return false;
-    }
+
+    };
 
     // copia o cpf se for válido e se estiver mostrando verde
     function copiar(){
+
         if(messages.innerHTML =="CPF válido" && messages.style.color =="green" ){
             cpf.select();
             document.execCommand('copy');
         }
         return false;
-    }
+
+    };
+
 </script>
